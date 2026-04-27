@@ -1,13 +1,13 @@
-name = "cdn3-dev"
+name = "cdn3"
 main = "src/index.ts"
 compatibility_date = "2023-05-10"
 compatibility_flags = ["nodejs_compat"]
 logpush = true
 
-# Specifies the r2 buckets. r2 bucket names are scoped to your account (not global). The buckets should be publicly inaccessible.
+# --- 默认配置 (直接指向你的正式桶) ---
 r2_buckets = [
-    { binding = "ATTACHMENT_BUCKET", bucket_name = "attachments-staging", preview_bucket_name = "attachments-staging" },
-    { binding = "BACKUP_BUCKET", bucket_name = "backups-staging", preview_bucket_name = "backups-staging" }
+    { binding = "ATTACHMENT_BUCKET", bucket_name = "antenna-v2-attachments", preview_bucket_name = "antenna-v2-attachments" },
+    { binding = "BACKUP_BUCKET", bucket_name = "antenna-v2-backups", preview_bucket_name = "antenna-v2-backups" }
 ]
 
 durable_objects.bindings = [
@@ -24,27 +24,14 @@ tag = "v2"
 renamed_classes = [{ from = "UploadHandler", to = "AttachmentUploadHandler" }]
 new_classes = ["BackupUploadHandler"]
 
+# --- 生产环境显式定义 ---
 [env.production]
 name = "cdn3"
+r2_buckets = [
+    { binding = "ATTACHMENT_BUCKET", bucket_name = "antenna-v2-attachments", preview_bucket_name = "antenna-v2-attachments" },
+    { binding = "BACKUP_BUCKET", bucket_name = "antenna-v2-backups", preview_bucket_name = "antenna-v2-backups" }
+]
 durable_objects.bindings = [
     { name = "ATTACHMENT_UPLOAD_HANDLER", class_name = "AttachmentUploadHandler" },
     { name = "BACKUP_UPLOAD_HANDLER", class_name = "BackupUploadHandler" }
 ]
-r2_buckets = [
-    { binding = "ATTACHMENT_BUCKET", bucket_name = "attachments", preview_bucket_name = "attachments" },
-    { binding = "BACKUP_BUCKET", bucket_name = "backups", preview_bucket_name = "backups" }
-]
-
-[env.staging]
-name = "cdn3-staging"
-durable_objects.bindings = [
-    { name = "ATTACHMENT_UPLOAD_HANDLER", class_name = "AttachmentUploadHandler" },
-    { name = "BACKUP_UPLOAD_HANDLER", class_name = "BackupUploadHandler" }
-]
-r2_buckets = [
-    { binding = "ATTACHMENT_BUCKET", bucket_name = "attachments-staging", preview_bucket_name = "attachments-staging" },
-    { binding = "BACKUP_BUCKET", bucket_name = "backups-staging", preview_bucket_name = "backups-staging" }
-]
-
-# To set an auth secret,
-# wrangler secrets put SHARED_AUTH_SECRET 
